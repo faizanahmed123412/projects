@@ -1,218 +1,89 @@
-# 🧠 SpeakGenie – AI Voice Tutor for Kids
+Customer Churn Prediction using Machine Learning
+Project Overview
+This project focuses on building a machine learning model to predict customer churn for a telecommunications company. Customer churn, the act of customers discontinuing their service, is a critical business problem as retaining existing customers is often more cost-effective than acquiring new ones. This analysis aims to identify customers at risk of churning and understand the key factors driving churn, providing actionable insights for retention strategies.
 
-SpeakGenie is a real-time AI-powered voice tutor designed for children aged 6–16. It helps students practice speaking, comprehension, and vocabulary using live conversation, interactive **Roleplay Scenarios**, and multi-language support.
+Skills and Technologies Demonstrated
+Data Analysis & Manipulation: Pandas, NumPy
 
----
+Data Visualization: Matplotlib, Seaborn
 
-## ✨ Features
+Machine Learning: Scikit-learn (Logistic Regression, Decision Tree, Random Forest Classifier)
 
-- 🎙️ Real-time speech-to-text using Web Speech API
-- 🌐 Multi-language support for Indian regional languages
-- 🤖 Gemini-powered AI tutor responses
-- 🧑‍🏫 Roleplay Mode (School, Store, Home, etc.)
-- 📜 Conversation history tracking
-- 🎨 Light/Dark theme toggle and interactive UI
+Preprocessing: Handling missing values, Label Encoding, One-Hot Encoding, Feature Scaling (StandardScaler)
 
----
+Model Evaluation: Accuracy, Precision, Recall, F1-Score, Confusion Matrix, ROC AUC Curve
 
-## 🗂️ Folder Structure
-SpeakGenie/
-│
-├── backend/
-│ └── app.py
-│
-├── node/
-│ └── server.js
-│
-├── frontend/
-│ └── test.html
-│
-├── start_all.bat
-├── README.md
-└── requirements.txt
+Feature Importance Analysis
 
+Jupyter Notebook for interactive development and documentation
 
----
+Git & GitHub for version control and project hosting
 
-## 🧪 How to Run Locally
+Dataset
+The dataset used for this project is the IBM Telco Customer Churn dataset, publicly available on Kaggle. It contains information about a telecommunications company's customers, including various demographic, service, and account information, and whether they churned or not.
 
-### 1️⃣ Backend (Python + Gemini)
+Key Findings & Model Performance
+After comprehensive Exploratory Data Analysis (EDA) and robust preprocessing, a Random Forest Classifier was trained to predict churn.
 
-#### Prerequisites
-- Python 3.8+
-- Your Google Gemini API Key
+ROC AUC Score: 0.8250 - This indicates a strong ability of the model to distinguish between churning and non-churning customers.
 
-#### Setup Steps
+Accuracy: 0.7850
 
-```bash
-cd backend
-python -m venv venv         # Optional: Create virtual environment
-source venv/bin/activate    # or venv\Scripts\activate on Windows
+Precision (for Churn=1): 0.6272
 
-# Install packages
-pip install -r requirements.txt
-If requirements.txt is missing, use:
+Recall (for Churn=1): 0.4679
 
+F1-Score (for Churn=1): 0.5360
 
-pip install flask flask-cors google-generativeai
+Confusion Matrix:
 
+[[931 104]
+ [199 175]]
 
-Add Your API Key
-In app.py, replace with your own key:
+True Positives (TP): 175 (Correctly predicted churn)
 
+False Negatives (FN): 199 (Missed actual churners)
 
-genai.configure(api_key="YOUR_API_KEY")
+Key Churn Drivers Identified (Feature Importance):
+Through feature importance analysis, the following factors were found to be most influential in predicting customer churn:
 
+Tenure: Customers with shorter tenure are significantly more likely to churn.
 
-Run the Flask App
+Contract Type: Month-to-month contracts are strongly associated with higher churn rates.
 
-python app.py
-Flask server will run at: http://127.0.0.1:5000
+Internet Service: Customers with Fiber Optic internet service show higher churn.
 
-Node.js Server (Proxy for API calls)
-Prerequisites
-Node.js and npm installed
+Online Security: Lack of online security services is a strong indicator of churn.
 
-Setup Steps
+Monthly Charges: Higher monthly charges show a positive correlation with churn.
 
-cd node-server
+These insights can help the telecommunications company focus its retention efforts on high-risk customer segments.
 
+How to Run the Project
+Clone the Repository:
 
-npm install express axios cors
+git clone [YOUR_GITHUB_REPO_LINK_HERE]
+cd Customer-Churn-Prediction-ML
 
+Download Dataset:
 
-node server.js
-Node server will run at: http://localhost:3000
+Download WA_Fn-UseC_-Telco-Customer-Churn.csv from Kaggle and place it in the project directory.
 
-Frontend (HTML + JavaScript)
-No installation required. Just:
+Install Dependencies:
 
-Open the frontend directly in your browser:
+pip install pandas numpy scikit-learn matplotlib seaborn
 
-👉 **[Open test.html](frontend/test.html)**  
-(Or drag and drop the file into Chrome)
+Run Jupyter Notebook:
 
-Allow microphone permissions when prompted
-Make sure all the things given below:
-- Python and Node servers are running
----
+jupyter notebook Customer_Churn_Prediction.ipynb
 
-## ⚡ One-Click Start (Windows)
+Follow the steps in the notebook to execute the code and reproduce the analysis.
 
-To launch everything with a single double-click:
-
-1. Locate the file: `start_all.bat`
-2. Double-click it
-3. It will:
-   - Start the Python backend (Flask)
-   - Start the Node.js proxy server
-   - Open `test.html` in your default browser
-
-🧠 Make sure:
-- You have `Python`, `Node.js`, and required packages installed.
-- Your terminal paths are configured (`python`, `node`, `npm`, etc.)
+Future Enhancements (Optional)
+Experiment with advanced imbalance handling techniques (e.g., SMOTE, ADASYN).
 
----
+Perform hyperparameter tuning for the Random Forest model using GridSearchCV or RandomizedSearchCV.
 
-## 🛠 Optional (Mac/Linux Users)
+Explore other classification algorithms like XGBoost or LightGBM for comparison.
 
-Mac/Linux users can create a `start_all.sh`:
-
-```bash
-#!/bin/bash
-echo "🧠 Starting SpeakGenie..."
-
-# Start Python backend
-gnome-terminal -- bash -c "cd backend && python3 app.py; exec bash"
-
-# Start Node.js server
-gnome-terminal -- bash -c "cd node && node server.js; exec bash"
-
-# Open frontend
-xdg-open frontend/test.html
-
-echo "✅ All systems launched!"
-Make it executable:
-
-bash
-Copy
-Edit
-chmod +x start_all.sh
-Then run:
-
-bash
-Copy
-Edit
-./start_all.sh
-
-Start interacting with the AI Tutor!
-
-🌍 Supported Languages
-Language	Code
-English	en-US
-Hindi	hi-IN
-Tamil	ta-IN
-Telugu	te-IN
-Bengali	bn-IN
-Gujarati	gu-IN
-Kannada	kn-IN
-Malayalam	ml-IN
-Marathi	mr-IN
-Punjabi	pa-IN
-Urdu	ur-IN
-
-Select your preferred language from the dropdown before starting.
-
-🎭 Roleplay Mode (Practice Speaking!)
-Students can practice conversations based on scenes:
-
-🏫 At School
-vbnet
-Copy
-Edit
-AI: “Good morning! What’s your name?”
-Student: “My name is Aarav.”
-AI: “Hi Aarav! Do you like school?”
-🛒 At the Store
-vbnet
-Copy
-Edit
-AI: “Welcome! What do you want to buy today?”
-Student: “I want a banana.”
-AI: “One banana coming right up!”
-👨‍👩‍👧 At Home
-vbnet
-Copy
-Edit
-AI: “Who do you live with?”
-Student: “I live with my parents.”
-AI: “Nice! Do you help them at home?”
-Use the Roleplay button in the interface to begin a guided scenario.
-
-🗃️ Conversation History
-All conversations are saved in memory during the session
-
-You can fetch them via: GET http://127.0.0.1:5000/history
-
-📝 Sharing Instructions
-To share with others:
-
-Zip the entire SpeakGenie/ folder
-
-Send via email, Google Drive, or GitHub
-
-
-
-👩‍💻 Credits
-Developed using:
-
-Google Gemini API (via Python Flask)
-
-Node.js Proxy Server
-
-Web Speech API (Browser)
-
-HTML + CSS + JavaScript frontend
-
-SpeakGenie is built to help kids learn language through fun, interactive, spoken conversations!
-
+Build a simple web application (e.g., using Flask/Streamlit) to deploy the trained model for interactive predictions.
