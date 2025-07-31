@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpeakGenie Tutor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    :root {
+      --bg-color: #f3f4f6;
+      --text-color: #111;
+      --card-bg: #fff;
+      --primary: #4f46e5;
+    }
+    [data-theme="dark"] {
+      --bg-color: #1f2937;
+      --text-color: #f9fafb;
+      --card-bg: #374151;
+    }
+
+    .chat-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    .toggle-theme {
+      cursor: pointer;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    select, button {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      width: 100%;
+    }
+    .bubble {
+      padding: 12px 16px;
+      background: #e0e7ff;
+      margin: 8px 0;
+      border-radius: 20px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    .user {
+      background: #d1fae5;
+      align-self: flex-end;
+    }
+    .chat {
+      display: flex;
+      flex-direction: column;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .message-block {
+      display: flex;
+      align-items: flex-start;
+    }
+    .message-block.user {
+      flex-direction: row-reverse;
+    }
+    .message-block.user .avatar {
+      margin-left: 10px;
+      margin-right: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="header">
+      <h2>🧠 SpeakGenie Tutor</h2>
+      <button class="toggle-theme" onclick="toggleTheme()">🌗 Toggle Theme</button>
+    </div>
+
+    <label for="language">🌐 Choose Language:</label>
+    <select id="language">
+      <option value="en-US">English</option>
+      <option value="hi-IN">Hindi</option>
+      <option value="ta-IN">Tamil</option>
+      <option value="te-IN">Telugu</option>
+      <option value="bn-IN">Bengali</option>
+      <option value="gu-IN">Gujarati</option>
+      <option value="kn-IN">Kannada</option>
+      <option value="ml-IN">Malayalam</option>
+      <option value="mr-IN">Marathi</option>
+      <option value="pa-IN">Punjabi</option>
+      <option value="ur-IN">Urdu</option>
+    </select>
+
+    <label for="scenario">🎭 Choose Roleplay Scenario:</label>
+    <select id="scenario">
+      <option value="🏫 At School">🏫 At School</option>
+      <option value="🛒 At the Store">🛒 At the Store</option>
+      <option value="👨‍👩‍👧 At Home">👨‍👩‍👧 At Home</option>
+    </select>
+
+    <button onclick="startSpeaking()">🎤 Start Speaking</button>
+    <button onclick="startRoleplay()">🎭 Start Roleplay</button>
+
+    <div class="chat" id="chatBox"></div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const languageSelect = document.getElementById("language");
+    const scenarioSelect = document.getElementById("scenario");
+
+    function toggleTheme() {
+      const theme = document.body.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.body.setAttribute("data-theme", theme);
+    }
+
+    function appendMessage(text, isUser = false) {
+      const msgBlock = document.createElement("div");
+      msgBlock.className = `message-block ${isUser ? "user" : "bot"}`;
+
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = isUser ? "https://i.imgur.com/jXzxaQS.png" : "https://i.imgur.com/dZ5wRtb.png";
+
+      const bubble = document.createElement("div");
+      bubble.className = `bubble ${isUser ? "user" : "bot"}`;
+      bubble.textContent = text;
+
+      msgBlock.appendChild(avatar);
+      msgBlock.appendChild(bubble);
+
+      chatBox.appendChild(msgBlock);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function startSpeaking() {
+      const lang = languageSelect.value;
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = lang;
+      recognition.interimResults = false;
+
+      recognition.onresult = async (event) => {
+        const text = event.results[0][0].transcript;
+        appendMessage(text, true);
+
+        try {
+          const res = await fetch("http://localhost:3000/api/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+          });
+
+          const data = await res.json();
+          if (data.response) {
+            appendMessage(data.response);
+            const utterance = new SpeechSynthesisUtterance(data.response);
+            utterance.lang = lang;
+            speechSynthesis.speak(utterance);
+          } else {
+            appendMessage("❌ Gemini error.");
+          }
+        } catch (err) {
+          appendMessage("❌ Error: Failed to fetch");
+        }
+      };
+
+      recognition.onerror = (event) => {
+        appendMessage(`❌ Speech recognition error: ${event.error}`);
+      };
+
+      recognition.start();
+    }
+
+    async function startRoleplay() {
+      const lang = languageSelect.value;
+      const scenario = scenarioSelect.value;
+
+      let initialPrompt = "";
+      if (scenario === "🏫 At School") initialPrompt = "Good morning! What’s your name?";
+      else if (scenario === "🛒 At the Store") initialPrompt = "Welcome! What do you want to buy today?";
+      else if (scenario === "👨‍👩‍👧 At Home") initialPrompt = "Who do you live with?";
+
+      appendMessage(`${scenario}\n${initialPrompt}`);
+      const utterance = new SpeechSynthesisUtterance(initialPrompt);
+      utterance.lang = lang;
+      speechSynthesis.speak(utterance);
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = lang;
+      recognition.interimResults = false;
+
+      recognition.onresult = async (event) => {
+        const text = event.results[0][0].transcript;
+        appendMessage(text, true);
+
+        try {
+          const res = await fetch("http://localhost:3000/api/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text, mode: "roleplay", scenario })
+          });
+
+          const data = await res.json();
+          if (data.response) {
+            appendMessage(data.response);
+            const replyUtterance = new SpeechSynthesisUtterance(data.response);
+            replyUtterance.lang = lang;
+            speechSynthesis.speak(replyUtterance);
+          } else {
+            appendMessage("❌ Gemini error.");
+          }
+        } catch (err) {
+          appendMessage("❌ Error: Failed to fetch");
+        }
+      };
+
+      recognition.onerror = (event) => {
+        appendMessage(`❌ Speech recognition error: ${event.error}`);
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
